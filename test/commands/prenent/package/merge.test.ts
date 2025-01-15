@@ -1,7 +1,7 @@
 import { TestContext } from '@salesforce/core/testSetup';
-import { expect } from 'chai';
+// import { expect } from 'chai';
 import { stubSfCommandUx } from '@salesforce/sf-plugins-core';
-import PrenentPackageMerge from '../../../../src/commands/prenent/package/merge.js';
+// import PrenentPackageMerge from '../../../../src/commands/prenent/package/merge.js';
 
 describe('prenent package merge', () => {
   const $$ = new TestContext();
