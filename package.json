@@ -1,7 +1,7 @@
 {
-  "name": "prenent",
+  "name": "@entlog/prenent",
   "description": "Package Recombination Engine Nurtured by ENT",
-  "version": "1.0.0",
+  "version": "1.0.0rc2",
   "dependencies": {
     "@oclif/core": "^4",
     "@salesforce/core": "^8",
@@ -37,7 +37,7 @@
     "sfdx",
     "sfdx-plugin"
   ],
-  "license": "BSD-3-Clause",
+  "license": "GPL-3.0",
   "oclif": {
     "commands": "./lib/commands",
     "bin": "sf",
@@ -69,7 +69,6 @@
     "format": "wireit",
     "link-check": "wireit",
     "lint": "wireit",
-    "postinstall": "yarn husky install",
     "postpack": "sf-clean --ignore-signing-artifacts",
     "prepack": "sf-prepack",
     "test": "wireit",
@@ -112,7 +111,7 @@
       "output": []
     },
     "lint": {
-      "command": "eslint src test --color --cache --cache-location .eslintcache",
+      "command": "eslint test --color --cache --cache-location .eslintcache",
       "files": [
         "src/**/*.ts",
         "test/**/*.ts",
@@ -193,5 +192,21 @@
   },
   "exports": "./lib/index.js",
   "type": "module",
-  "author": "entlog"
+  "author": "entlog",
+  "main": "index.js",
+  "bin": {
+    "prenent": "bin/dev.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/entlog/prenent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/entlog/prenent/issues"
+  },
+  "homepage": "https://github.com/entlog/prenent#readme"
 }

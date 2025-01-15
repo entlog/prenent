@@ -8,7 +8,7 @@ import PackageParser from '../../../parser/packageparser.js';
 // const logger: Logger = await Logger.child('Stream');
 
 Messages.importMessagesDirectoryFromMetaUrl(import.meta.url);
-const messages = Messages.loadMessages('prenent', 'prenent.package.merge');
+const messages = Messages.loadMessages('@entlog/prenent', 'prenent.package.merge');
 
 export type PrenentPackageMergeResult = {
    path: string;
@@ -33,17 +33,17 @@ export default class PrenentPackageMerge extends SfCommand<PrenentPackageMergeRe
    public async run(): Promise<PrenentPackageMergeResult> {
       const { flags } = await this.parse(PrenentPackageMerge);
 
-      for (let input of flags.input) {
+      const parsers = [];
+      for (const input of flags.input) {
          this.log(`Reading ${input}`);
-         const model = await PackageParser.parseFromFile(input);
-         this.log(`Obtained model`, model);
+         parsers.push(PackageParser.parseFromFile(input));
+
       }
-      // parser.push('<xml>Hello, <who name="world">world</who>!</xml>')
-      //    .done();
-      // parser.write('<xml>Hello, <who name="world">world</who>!</xml>').close();
-      await ((time: number) => {
-         return new Promise((rs, rj) => setTimeout(rs, time));
-      })(2000);
+      const models = await Promise.all(parsers);
+      console.log(`Obtained models: ${JSON.stringify(models)}`);
+      await ((time: number) =>
+         new Promise((rs) => { setTimeout(rs, time); })
+      )(2000);
       return {
          path: 'src/commands/prenent/package/merge.ts',
       };

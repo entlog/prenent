@@ -3,70 +3,98 @@ import { SAXParser } from "sax-ts";
 import fs from "graceful-fs";
 
 export class PackageType {
-   public type: string | undefined = undefined;
-   public values: string[] = [];
+  public type: string | undefined = undefined;
+  public values: string[] = [];
 }
 
 export class PackageModel {
-   public items: PackageType[] = [];
+
+  public typesOrComment: (PackageType | string)[] = [];
+  public version: string | undefined;
 }
 
+
 export default class PackageParser {
-   private logger: Logger | undefined;
-   private parser: SAXParser;
-   private model: PackageModel = new PackageModel();
+  private logger: Logger | undefined;
+  private parser: SAXParser;
+  private model: PackageModel = new PackageModel();
 
-   private tree: any[] = [];
+  private tree: any[] = [];
 
-   private onOpenTag(node: any) {
-      this.logger?.info(`Open tag ${node.name}`);
-      this.tree.push(node);
-   }
-   private onText(t: string) {
-      this.logger?.info(`On text ${t}`);
-   }
-   private onCloseTag() {
-      const popped: any | undefined = this.tree.pop();
-      this.logger?.info(`On Close tag ${popped?.name}`);
+  private onOpenTag(node: any) {
+    // this.logger?.info(`Open tag ${node.name}`);
+    if (node.name.toLowerCase() === 'types') {
+      this.model.typesOrComment.push(new PackageType());
+    }
+    this.tree.push(node);
+  }
+  private onComment(t: string) {
+    this.logger?.info(`Comment obtained ${t}`)
+    this.model.typesOrComment.push(t.trim());
+  }
 
-   }
+  private onText(t: string) {
+    // this.logger?.info(`On text ${t}`);
+    if (this.tree.length == 0) {
+      // this.logger?.info(`Ignoring text out of node`);
+      return; // Text out of nodes
+    }
+    const nodeName = this.tree[this.tree.length - 1].name.toLowerCase();
+    // this.logger?.info(`Handling text in node ${nodeName}`);
+    const currentItem = this.model.typesOrComment[this.model.typesOrComment.length - 1]
+    if (nodeName == 'name' && currentItem instanceof PackageType) {
+      currentItem.type = t.trim();
+      this.logger?.info(`Set type name set to ${currentItem.type}`)
 
-   public constructor() {
-      this.parser = new SAXParser(true, {});
-   }
-   public async build(): Promise<PackageParser> {
-      this.logger = await Logger.child('Stream')
-      this.logger.info('Created logger!!')
-      this.parser.onopentag = (node: any) => { this.onOpenTag(node) }
-      this.parser.ontext = (t: string) => { this.onText(t) };
-      this.parser.onclosetag = () => { this.onCloseTag() };
-      return this;
-   }
+    } else if (nodeName === 'members' && currentItem instanceof PackageType) {
+      currentItem.values.push(t.trim());
+    } else if (nodeName === 'version') {
+      this.model.version = t.trim();
+      this.logger?.info(`Set version to ${this.model.version}`)
+    }
+  }
+  private onCloseTag() {
+    const popped: any | undefined = this.tree.pop();
+    this.logger?.debug(`On Close tag ${popped?.name}`);
 
-   protected push(text: string): PackageParser {
-      this.logger?.info(`Pushed ${text}`)
-      this.parser.write(text);
-      return this;
-   }
+  }
 
-   protected done(): PackageModel {
-      this.parser.close();
-      return this.model;
-   }
+  public constructor() {
+    this.parser = new SAXParser(true, {});
+  }
+  public async build(): Promise<PackageParser> {
+    this.logger = await Logger.child('Stream')
+    this.logger.info('Created logger!!')
+    this.parser.onopentag = (node: any) => { this.onOpenTag(node) }
+    this.parser.ontext = (t: string) => { this.onText(t) };
+    this.parser.onclosetag = () => { this.onCloseTag() };
+    this.parser.oncomment = (t: string) => { this.onComment(t) };
+    return this;
+  }
+
+  protected push(text: string): PackageParser {
+    this.logger?.info(`Pushed ${text}`)
+    this.parser.write(text);
+    return this;
+  }
+
+  protected done(): PackageModel {
+    this.parser.close();
+    return this.model;
+  }
 
 
-   public static async parseFromFile(file: string): Promise<PackageModel> {
-      const parser = await new PackageParser().build();
-      const fd: number = fs.openSync(file, "r");
-      const b: Buffer = Buffer.alloc(1024);
-      let read: number = fs.readSync(fd, b, 0, 1024, null);
-      const decoder = new TextDecoder("UTF-8");
-      while (read > 0) {
-         parser.push(decoder.decode(b).substring(0, read));
-         read = fs.readSync(fd, b, 0, 1024, null);
-      }
-      parser.done();
-      return Promise.resolve(new PackageModel());
-   }
+  public static async parseFromFile(file: string): Promise<PackageModel> {
+    const parser = await new PackageParser().build();
+    const fd: number = fs.openSync(file, "r");
+    const b: Buffer = Buffer.alloc(1024);
+    let read: number = fs.readSync(fd, b, 0, 1024, null);
+    const decoder = new TextDecoder("UTF-8");
+    while (read > 0) {
+      parser.push(decoder.decode(b).substring(0, read));
+      read = fs.readSync(fd, b, 0, 1024, null);
+    }
+    return parser.done();
+  }
 }
 
