@@ -6,13 +6,6 @@ Summary of a command.
 
 More information about a command. Don't repeat the summary. 
 
-# flags.name.summary
-
-Description of a flag.
-
-# flags.name.description
-
-More information about a flag. Don't repeat the summary. 
 
 # examples
 
@@ -22,3 +15,15 @@ More information about a flag. Don't repeat the summary.
 # flags.input.summary
 
 Input package.
+
+# flags.input.description
+
+Input package file to be merged
+
+# flags.output.summary
+
+Output file
+
+# flags.output.description
+
+Output file name for merged packages

@@ -1,36 +1,37 @@
 import { Logger } from "@salesforce/core";
 import { SAXParser } from "sax-ts";
 import fs from "graceful-fs";
+import PackageModel, { PackageType } from "../model/packagemodel.js";
 
-export class PackageType {
-  public type: string | undefined = undefined;
-  public values: string[] = [];
-}
-
-export class PackageModel {
-
-  public typesOrComment: (PackageType | string)[] = [];
-  public version: string | undefined;
-}
 
 
 export default class PackageParser {
   private logger: Logger | undefined;
   private parser: SAXParser;
   private model: PackageModel = new PackageModel();
+  private lastComments: string[] = [];
 
   private tree: any[] = [];
 
   private onOpenTag(node: any) {
     // this.logger?.info(`Open tag ${node.name}`);
-    if (node.name.toLowerCase() === 'types') {
-      this.model.typesOrComment.push(new PackageType());
+    const nodeName = node.name.toLowerCase();
+    if (nodeName === 'types') {
+      const type = new PackageType();
+
+      type.comments = this.lastComments;
+      this.lastComments = [];
+
+      this.model.types.push(type);
+    } else if (nodeName == 'package') {
+      this.model.comments = this.lastComments;
+      this.lastComments = [];
     }
     this.tree.push(node);
   }
   private onComment(t: string) {
     this.logger?.info(`Comment obtained ${t}`)
-    this.model.typesOrComment.push(t.trim());
+    this.lastComments.push(t.trim());
   }
 
   private onText(t: string) {
@@ -41,12 +42,12 @@ export default class PackageParser {
     }
     const nodeName = this.tree[this.tree.length - 1].name.toLowerCase();
     // this.logger?.info(`Handling text in node ${nodeName}`);
-    const currentItem = this.model.typesOrComment[this.model.typesOrComment.length - 1]
-    if (nodeName == 'name' && currentItem instanceof PackageType) {
+    const currentItem = this.model.types[this.model.types.length - 1]
+    if (nodeName == 'name') {
       currentItem.type = t.trim();
       this.logger?.info(`Set type name set to ${currentItem.type}`)
 
-    } else if (nodeName === 'members' && currentItem instanceof PackageType) {
+    } else if (nodeName === 'members') {
       currentItem.values.push(t.trim());
     } else if (nodeName === 'version') {
       this.model.version = t.trim();
@@ -63,7 +64,7 @@ export default class PackageParser {
     this.parser = new SAXParser(true, {});
   }
   public async build(): Promise<PackageParser> {
-    this.logger = await Logger.child('Stream')
+    this.logger = await Logger.child('Parser');
     this.logger.info('Created logger!!')
     this.parser.onopentag = (node: any) => { this.onOpenTag(node) }
     this.parser.ontext = (t: string) => { this.onText(t) };
@@ -85,16 +86,20 @@ export default class PackageParser {
 
 
   public static async parseFromFile(file: string): Promise<PackageModel> {
-    const parser = await new PackageParser().build();
     const fd: number = fs.openSync(file, "r");
-    const b: Buffer = Buffer.alloc(1024);
-    let read: number = fs.readSync(fd, b, 0, 1024, null);
-    const decoder = new TextDecoder("UTF-8");
-    while (read > 0) {
-      parser.push(decoder.decode(b).substring(0, read));
-      read = fs.readSync(fd, b, 0, 1024, null);
+    try {
+      const parser = await new PackageParser().build();
+      const b: Buffer = Buffer.alloc(1024);
+      let read: number = fs.readSync(fd, b, 0, 1024, null);
+      const decoder = new TextDecoder("UTF-8");
+      while (read > 0) {
+        parser.push(decoder.decode(b).substring(0, read));
+        read = fs.readSync(fd, b, 0, 1024, null);
+      }
+      return parser.done();
+    } finally {
+      fs.closeSync(fd);
     }
-    return parser.done();
   }
 }
 

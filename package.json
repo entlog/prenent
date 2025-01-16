@@ -110,10 +110,8 @@
       "output": []
     },
     "lint": {
-      "command": "eslint test --color --cache --cache-location .eslintcache",
+      "command": "eslint --color --cache --cache-location .eslintcache",
       "files": [
-        "src/**/*.ts",
-        "test/**/*.ts",
         "messages/**",
         "**/.eslint*",
         "**/tsconfig.json"
@@ -131,8 +129,7 @@
     "test": {
       "dependencies": [
         "test:compile",
-        "test:only",
-        "lint"
+        "test:only"
       ]
     },
     "test:only": {
