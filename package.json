@@ -1,7 +1,7 @@
 {
   "name": "@entlog/prenent",
   "description": "Package Recombination Engine Nurtured by ENT",
-  "version": "1.0.0rc3",
+  "version": "1.0.0rc5",
   "dependencies": {
     "@oclif/core": "^4",
     "@salesforce/core": "^8",
@@ -110,7 +110,7 @@
       "output": []
     },
     "lint": {
-      "command": "eslint --color --cache --cache-location .eslintcache",
+      "command": "eslint src --color --cache --cache-location .eslintcache",
       "files": [
         "messages/**",
         "**/.eslint*",
