@@ -20,6 +20,10 @@ sf prenent package merge -i file1.xml -i file2.xml -o merged.xml
 
 For the help execute:
 
+```
+sf prenent package merge --help
+```
+
 ## Details
 
 ### Merged version
