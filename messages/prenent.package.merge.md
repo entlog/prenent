@@ -1,16 +1,14 @@
 # summary
 
-Summary of a command.
+Plugin to merge package files
 
 # description
 
-More information about a command. Don't repeat the summary. 
-
+Use this plugin to combine several packages into a single one.
 
 # examples
 
-- <%= config.bin %> <%= command.id %>
-
+- <%= config.bin %> <%= command.id %> -i package1.xml -i package2.xml -i package3.xml -o outpackage.xml
 
 # flags.input.summary
 
@@ -18,7 +16,7 @@ Input package.
 
 # flags.input.description
 
-Input package file to be merged
+Input package file to be merged. Can be specified multiple times
 
 # flags.output.summary
 

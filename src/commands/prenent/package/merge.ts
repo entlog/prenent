@@ -1,8 +1,5 @@
 import { SfCommand, Flags } from '@salesforce/sf-plugins-core';
 import { Messages } from '@salesforce/core';
-// import { SaxesParser } from 'saxes';
-// import { SAXParser } from "sax-ts";
-// import { Logger } from '@salesforce/core';
 import PackageParser from '../../../parser/packageparser.js';
 import PackageMerger from '../../../merger/packagemerger.js';
 import FilePackageWriter from '../../../writer/packagewriter.js';
