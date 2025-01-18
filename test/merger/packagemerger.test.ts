@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import PackageModel, { PackageType } from '../../src/model/packagemodel.js';
+import PackageModel, { PackageType } from '../../src/model/package.js';
 import PackageMerger from '../../src/merger/packagemerger.js';
 
 describe('merger', () => {

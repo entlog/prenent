@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import fs from 'graceful-fs';
-import PackageModel from '../../src/model/packagemodel.js';
+import PackageModel from '../../src/model/package.js';
 import PackageParser from '../../src/parser/packageparser.js';
 
 describe('parser', () => {

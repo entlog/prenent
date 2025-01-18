@@ -3,7 +3,7 @@ import { expect } from 'chai';
 
 import fs from 'graceful-fs';
 import PackageParser from '../../../../src/parser/packageparser.js';
-import PackageModel from '../../../../src/model/packagemodel.js';
+import PackageModel from '../../../../src/model/package.js';
 
 describe('prenent package merge NUTs', () => {
   let session: TestSession;

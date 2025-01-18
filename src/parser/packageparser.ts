@@ -1,7 +1,7 @@
 import { Logger } from '@salesforce/core';
 import { SAXParser } from 'sax-ts';
 import fs from 'graceful-fs';
-import PackageModel, { PackageType } from '../model/packagemodel.js';
+import PackageModel, { PackageType } from '../model/package.js';
 
 class Node {
   public name: string = '';

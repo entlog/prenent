@@ -1,6 +1,6 @@
 import { Logger } from '@salesforce/core';
 import fs from 'graceful-fs';
-import PackageModel from '../model/packagemodel.js';
+import PackageModel from '../model/package.js';
 
 export default class FilePackageWriter {
   private logger: Logger | undefined;

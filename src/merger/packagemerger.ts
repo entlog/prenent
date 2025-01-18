@@ -1,4 +1,4 @@
-import PackageModel, { PackageType } from '../model/packagemodel.js';
+import PackageModel, { PackageType } from '../model/package.js';
 
 export default class PackageMerger {
   private models: PackageModel[] = [];
