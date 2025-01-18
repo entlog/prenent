@@ -18,6 +18,11 @@ export default class PackageMerger {
     const ret: PackageModel = new PackageModel();
     for (const model of this.models) {
       model.comments.map((c) => ret.comments.push(c));
+      if (ret.version === undefined) {
+        ret.version = model.version;
+      } else {
+        ret.version = parseInt(ret.version, 10) > parseInt(model.version as string, 10) ? ret.version : model.version;
+      }
       for (const type of model.types) {
         if (type instanceof PackageType) {
           let retType = ret.types.find((t) => t instanceof PackageType && t.type === type.type);
